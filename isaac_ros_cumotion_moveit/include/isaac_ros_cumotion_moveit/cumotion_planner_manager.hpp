@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "moveit/planning_interface/planning_interface.hpp"
-#include "moveit/planning_scene/planning_scene.hpp"
+#include "moveit/planning_interface/planning_interface.h"
+#include "moveit/planning_scene/planning_scene.h"
 
 #include "isaac_ros_cumotion_moveit/cumotion_planning_context.hpp"
 

@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "moveit/planning_interface/planning_interface.hpp"
+#include "moveit/planning_interface/planning_interface.h"
 #include "rclcpp/rclcpp.hpp"
 
 #include "isaac_ros_cumotion_moveit/cumotion_move_group_client.hpp"

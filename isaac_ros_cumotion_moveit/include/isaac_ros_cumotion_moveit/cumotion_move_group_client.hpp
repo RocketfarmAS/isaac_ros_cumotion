@@ -21,8 +21,8 @@
 #include <future>
 #include <memory>
 
-#include "moveit/planning_interface/planning_interface.hpp"
-#include "moveit/planning_scene/planning_scene.hpp"
+#include "moveit/planning_interface/planning_interface.h"
+#include "moveit/planning_scene/planning_scene.h"
 #include "moveit_msgs/action/move_group.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"

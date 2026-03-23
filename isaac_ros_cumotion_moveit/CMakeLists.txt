@@ -13,6 +13,8 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 find_package(moveit_core REQUIRED)
+find_package(moveit_ros_planning REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -20,6 +22,8 @@ find_package(rclcpp_components REQUIRED)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_components
   moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
 )
 
 include_directories(include)

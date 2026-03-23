@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "moveit/planning_interface/planning_interface.hpp"
+#include "moveit/planning_interface/planning_interface.h"
 
 #include "isaac_ros_cumotion_moveit/cumotion_interface.hpp"
 
@@ -48,9 +48,9 @@ public:
   {
   }
 
-  void solve(planning_interface::MotionPlanResponse & res) override;
+  bool solve(planning_interface::MotionPlanResponse & res) override;
 
-  void solve(planning_interface::MotionPlanDetailedResponse & res) override;
+  bool solve(planning_interface::MotionPlanDetailedResponse & res) override;
 
   bool terminate() override
   {
