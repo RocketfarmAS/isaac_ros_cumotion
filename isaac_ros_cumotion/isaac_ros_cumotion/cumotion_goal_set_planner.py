@@ -146,7 +146,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
             if not world_update_status:
                 result.error_code.val = MoveItErrorCodes.COLLISION_CHECKING_UNAVAILABLE
                 self.get_logger().error('World update failed.')
-                goal_handle.abort()
+                goal_handle.abort(result)
                 return result
 
         start_state = None
@@ -158,7 +158,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
                     + self._CumotionActionServer__joint_states_topic
                 )
                 result.error_code.val = MoveItErrorCodes.INVALID_ROBOT_STATE
-                goal_handle.abort()
+                goal_handle.abort(result)
                 return result
             # read joint state:
             state = CuJointState.from_position(
@@ -184,7 +184,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
         else:
             self.get_logger().error('joint state in start state was empty')
             result.error_code.val = MoveItErrorCodes.INVALID_ROBOT_STATE
-            goal_handle.abort()
+            goal_handle.abort(result)
             return result
 
         if plan_req.plan_grasp:
@@ -193,7 +193,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
             self.get_logger().info(f'Success, Error Code): {success}, {error_code}!')
             if not success:
                 result.error_code.val = error_code
-                goal_handle.abort()
+                goal_handle.abort(result)
                 return result
             grasp_vec_weight = None
             if len(plan_req.grasp_partial_pose_vec_weight) == 6:
@@ -261,7 +261,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
                 if len(plan_req.goal_state.position) <= 0:
                     self.get_logger().error('goal state is empty')
                     result.error_code.val = MoveItErrorCodes.INVALID_GOAL_CONSTRAINTS
-                    goal_handle.abort()
+                    goal_handle.abort(result)
                     return result
                 goal_state = self.motion_gen.get_active_js(
                     CuJointState.from_position(
@@ -289,7 +289,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
                     if len(plan_req.grasp_partial_pose_vec_weight) < 6:
                         self.get_logger().error('Partial pose vec weight should be of length 6')
                         result.error_code.val = MoveItErrorCodes.INVALID_GOAL_CONSTRAINTS
-                        goal_handle.abort()
+                        goal_handle.abort(result)
                         return result
 
                     grasp_vec_weight = [plan_req.grasp_partial_pose_vec_weight[i]
@@ -303,7 +303,7 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
                 success, error_code, poses = self.get_goal_poses(plan_req)
                 if not success:
                     result.error_code.val = error_code
-                    goal_handle.abort()
+                    goal_handle.abort(result)
                     return result
 
                 self.toggle_link_collision(plan_req.disable_collision_links, False)
@@ -369,7 +369,10 @@ class CumotionGoalSetPlannerServer(CumotionActionServer):
             )
 
         self._CumotionActionServer__query_count += 1
-
+        if result.success:
+            goal_handle.succeed(result)
+        else:
+            goal_handle.abort(result)
         return result
 
 
