@@ -42,7 +42,7 @@ class PoseToPoseNode(Node):
         self._target_frame_idx = 0
 
         self._plan_timer_period = self.declare_parameter(
-            'plan_timer_period', 0.01).get_parameter_value().double_value
+            'plan_timer_period', 1.0).get_parameter_value().double_value
 
         planner_group_name = self.declare_parameter(
             'planner_group_name', 'ur_manipulator').get_parameter_value().string_value

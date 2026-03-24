@@ -732,9 +732,9 @@ class CumotionActionServer(Node):
     def execute_callback(self, goal_handle):
         if self.planner_busy:
             self.get_logger().error('Planner is busy')
-            goal_handle.abort()
             result = MoveGroup.Result()
             result.error_code.val = MoveItErrorCodes.FAILURE
+            goal_handle.abort(result)
             return result
 
         self.get_logger().info('Executing goal...')
@@ -751,8 +751,6 @@ class CumotionActionServer(Node):
                                str(time_dilation_factor))
         plan_req = goal_handle.request.request
 
-        goal_handle.succeed()
-
         scene = goal_handle.request.planning_options.planning_scene_diff
 
         world_objects = scene.world.collision_objects
@@ -762,6 +760,7 @@ class CumotionActionServer(Node):
         if not world_update_status:
             result.error_code.val = MoveItErrorCodes.COLLISION_CHECKING_UNAVAILABLE
             self.get_logger().error('World update failed.')
+            goal_handle.abort(result)
             return result
         start_state = None
         if len(plan_req.start_state.joint_state.position) > 0:
@@ -782,6 +781,7 @@ class CumotionActionServer(Node):
                 self.get_logger().error(
                     'joint_state was not received from ' + self.__joint_states_topic
                 )
+                goal_handle.abort(result)
                 return result
 
             # read joint state:
@@ -796,6 +796,7 @@ class CumotionActionServer(Node):
                     ' start velocity shape is ' + str(state.velocity.shape) +
                     ', both should match. JointState was read from ' + self.__joint_states_topic
                 )
+                goal_handle.abort(result)
                 return result
             current_joint_state = self.motion_gen.get_active_js(state)
             if start_state is not None and plan_req.start_state.is_diff:
@@ -855,6 +856,7 @@ class CumotionActionServer(Node):
                     + '" do not match'
                 )
                 result.error_code.val = MoveItErrorCodes.INVALID_LINK_NAME
+                goal_handle.abort(result)
                 return result
             if position_link_name != plan_link_name:
                 self.get_logger().error(
@@ -866,9 +868,13 @@ class CumotionActionServer(Node):
                     + position_link_name
                 )
                 result.error_code.val = MoveItErrorCodes.INVALID_LINK_NAME
+                goal_handle.abort(result)
                 return result
         else:
             self.get_logger().error('Goal constraints not supported')
+            result.error_code.val = MoveItErrorCodes.INVALID_GOAL_CONSTRAINTS
+            goal_handle.abort(result)
+            return result
         with self.lock:
             self.planner_busy = True
 
@@ -918,6 +924,10 @@ class CumotionActionServer(Node):
             + str(motion_gen_result.status)
         )
         self.__query_count += 1
+        if result.error_code.val == MoveItErrorCodes.SUCCESS:
+            goal_handle.succeed(result)
+        else:
+            goal_handle.abort(result)
         return result
 
     def publish_voxels(self, voxels):
